@@ -44,5 +44,6 @@ LOCATION_MAPPING = {
     "freiberg": "Freiberg am Neckar",
     "sulzbach": "Sulzbach an der Murr",
     "karlsruher": "Karlsruhe",
-    "steinhausen": "Steinhausen an der Rottum"
+    "steinhausen": "Steinhausen an der Rottum",
+    "fasanenhof": "Stuttgart-Fasanenhof"
 }
