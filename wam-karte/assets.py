@@ -2,7 +2,6 @@ import folium
 from folium.plugins import MarkerCluster, LocateControl
 from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
-from assets import generate_head_meta, generate_custom_ui
 from ical_builder import create_ical_data_url
 
 def build_map(events):
