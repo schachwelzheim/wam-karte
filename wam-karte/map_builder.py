@@ -3,9 +3,10 @@ from folium.plugins import MarkerCluster, LocateControl
 from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
 from assets import generate_head_meta, generate_custom_ui
+from ical_builder import create_ical_data_url
 
 def build_map(events):
-    geolocator = Nominatim(user_agent="wam_schach_karte_app_v43")
+    geolocator = Nominatim(user_agent="wam_schach_karte_app_v46")
     geocode = RateLimiter(geolocator.geocode, min_delay_seconds=1)
 
     wam_map = folium.Map(location=[48.7758, 9.1829], zoom_start=8)
@@ -38,12 +39,25 @@ def build_map(events):
         if location_data:
             print(f"✔ Ort gefunden: '{location_name}' ({location_data.latitude:.4f}, {location_data.longitude:.4f}) | Datum: {event['date']} ({event['iso_date']})")
             
-            links_html = ""
-            if event["links"]:
-                links_html = "<div style='margin-top: 8px; border-top: 1px solid #ccc; padding-top: 5px;'>"
+            # Sichere Auswertung der ISO-Daten
+            start_iso = event.get('iso_start') or event.get('iso_date', '')
+            ical_end_iso = event.get('iso_ical_end') or event.get('iso_date', '')
+
+            ical_url = create_ical_data_url(
+                title=f"Schachturnier: {event['type']} ({event['location']})",
+                location=f"{event['location']}, Baden-Württemberg",
+                date_start_iso=start_iso,
+                date_ical_end_iso=ical_end_iso,
+                description=f"Turnier: {event['type']}\\nDatum: {event['date']}\\nOrt: {event['location']}"
+            )
+
+            links_html = "<div style='margin-top: 8px; border-top: 1px solid #ccc; padding-top: 6px;'>"
+            links_html += f"<a href='{ical_url}' download='turnier_{start_iso}.ics' style='color: #28a745; font-weight: bold; text-decoration: none;'>📅 Kalender-Eintrag (.ics)</a><br>"
+
+            if event.get("links"):
                 for l in event["links"]:
-                    links_html += f"<a href='{l['url']}' target='_blank' style='color: #0066cc; font-weight: bold; text-decoration: underline;'>🔗 {l['title']}</a><br>"
-                links_html += "</div>"
+                    links_html += f"<a href='{l['url']}' target='_blank' style='color: #0066cc; font-weight: bold; text-decoration: underline; margin-top: 3px; display: inline-block;'>🔗 {l['title']}</a><br>"
+            links_html += "</div>"
 
             popup_html = f"""
             <div style='font-family: sans-serif; font-size: 13px; line-height: 1.4;'>
